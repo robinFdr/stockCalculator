@@ -1,0 +1,9 @@
+stocks/
+etc/
+.vscode/
+__pycache__/
+.ipynb_checkpoints
+Include/
+Lib/
+Scripts/
+share/
