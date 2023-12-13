@@ -1,12 +1,13 @@
 import csv
-from typing import List
-from bs4 import BeautifulSoup
-import requests
 import json
 import os
+from typing import List
+
+import requests
+from bs4 import BeautifulSoup
 
 
-class Stock:
+class LnsStock:
     url: str
     api_id: str
     wkn: str
@@ -27,26 +28,26 @@ class Stock:
         self.data = None
 
     def get_stock_from_url(url: str):
-        stock = Stock()
+        stock = LnsStock()
         stock.url = url
         resp = requests.get(url)
         html = resp.content.decode(encoding="UTF-8")
         soup = BeautifulSoup(html, "html.parser")
         stock.soup = soup
-        stock.api_id = Stock.__get_api_id(soup)
-        stock.name = Stock.__get_stock_name(soup)
-        stock.isin = Stock.__get_stock_isin(soup)
-        stock.wkn = Stock.__get_stock_wkn(soup)
+        stock.api_id = LnsStock.__get_api_id(soup)
+        stock.name = LnsStock.__get_stock_name(soup)
+        stock.isin = LnsStock.__get_stock_isin(soup)
+        stock.wkn = LnsStock.__get_stock_wkn(soup)
         stock.filepath = "./stocks/" + stock.isin + ".csv"
         return stock
 
     def get_stocks_from_watchlist():
-        stock_objs:list[Stock] = []
+        stock_objs:list[LnsStock] = []
         with open("./stocks/watchlist.json", "r") as f:
-            stocks_dicts = json.loads(f)["stocks"]
+            stocks_dict = json.loads(f.read())["stocks"]
 
-        for stock_dict in stocks_dicts:
-            stock_obj = Stock(
+        for stock_dict in stocks_dict:
+            stock_obj = LnsStock(
                 url=stock_dict["url"],
                 api_id=stock_dict["api_id"],
                 wkn=stock_dict["wkn"],
@@ -54,12 +55,13 @@ class Stock:
                 name=stock_dict["name"],
                 filepath=stock_dict["filepath"],
             )
-            with open(stock_obj.filepath, "r") as f:
-                reader = csv.reader(f, delimiter=",")
-                data = []
-                for l in reader:
-                    data.append((l[0].strip(), l[1].strip()))
-            stock_obj.data = data
+            if os.path.exists(stock_obj.filepath):
+                with open(stock_obj.filepath, "r") as f:
+                    reader = csv.reader(f, delimiter=",")
+                    data = []
+                    for l in reader:
+                        data.append((l[0].strip(), l[1].strip()))
+                    stock_obj.data = data
             stock_objs.append(stock_obj)
         return stock_objs
 
@@ -180,5 +182,5 @@ class Stock:
         return str(d)
 
     def update_local_data() -> None:
-        for stock in Stock.get_stocks_from_watchlist():
+        for stock in LnsStock.get_stocks_from_watchlist():
             stock.load_data()

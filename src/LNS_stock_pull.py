@@ -1,5 +1,6 @@
 from typing import Self
-from LNS_stock import Stock
 
-Stock.update_local_data()
-stocks = Stock.get_stocks_from_watchlist()
+from LNS_stock import LnsStock
+
+LnsStock.update_local_data()
+stocks = LnsStock.get_stocks_from_watchlist()

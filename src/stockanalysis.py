@@ -1,7 +1,7 @@
 import math
 
 
-class Stock:
+class BasicStock:
     def __init__(self, basePrice: float, sellingPrice: float, transactionCost: float = 2.0):
         self.basePrice = basePrice
         self.transactionCost = transactionCost
